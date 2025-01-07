@@ -9,4 +9,8 @@ router.get('/', (req, res) => {
     res.send('Hello World');
 });
 
+router.get('/create', (req, res) => {
+    res.render('user/create', {title: 'Create User'}); 
+});
+
 module.exports = router;
