@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -14,16 +14,15 @@ const pool = mysql.createPool({
   queueLimit: 0                                    
 });
 
-const connectDB = () => {
-  pool.getConnection((err, connection) => {
-    if (err) {
-      console.error('Error connecting to MySQL database \n:', err.stack);
-      process.exit(1);
-    } else {
-      console.log('Connected to MySQL database as ID ' + connection.threadId);
-      connection.release();
-    }
-  });
+const connectDB = async () => {
+  try {
+    const connection = await pool.getConnection();
+    console.log('Connected to MySQL database as ID ' + connection.threadId);
+    connection.release();
+  } catch (err) {
+    console.error('Error connecting to MySQL database \n:', err.stack);
+    process.exit(1);
+  }
 };
 
-module.exports = connectDB;
+module.exports = { connectDB, pool };

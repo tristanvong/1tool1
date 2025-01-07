@@ -1,10 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan'); 
-const connectDB = require('./config/db'); 
+const { connectDB } = require('./config/db');
 
 const homeRoutes = require('./routes/home');
 const errorRoutes = require('./routes/error');
+const userRoutes = require('./routes/user.js');
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.static('public'));
 
+app.use('/user', userRoutes); 
 app.use('/', homeRoutes);
 app.use('/', errorRoutes);
 
