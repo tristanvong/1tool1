@@ -1,9 +1,12 @@
 extends ../layouts/layout
 
 block content
-  h2(class="text-3xl text-center text-[#411900] mt-8") Welcome, #{user.name}!
-  p(class="mt-4 text-center text-gray-600") This is your dashboard.
+    h1 Welcome to your Dashboard, #{user.name}
+    h2 Your Email: #{user.email}
+    h3 Users you can chat with:
 
-  div(class="mt-8 text-center")
-    p(class="text-gray-500") Email: #{user.email}
-    a(href="/user/logout", class="text-[#411900] underline hover:text-[#6f2600]") Logout
+    each user in users
+        form(action="/chat" method="post")
+            input(type="hidden" name="receiverId" value=user.id)
+            p= user.name + " - " + user.email
+            button(type="submit", class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded") Chat

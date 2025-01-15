@@ -1,0 +1,26 @@
+extends layouts/layout
+
+block content
+  div(class="flex flex-col items-center justify-center min-h-screen bg-gray-100")
+    h1(class="text-4xl font-bold mb-6 text-center text-gray-800") Chat Room
+
+    form(action="/chat/send" method="post" class="w-full max-w-xl bg-white p-8 rounded shadow-lg")
+      input(type="hidden" name="chatRoomId" value=chatRoomId)
+
+      div(class="mb-4")
+        textarea(name="message" rows="4" placeholder="Type your message..." class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent")
+      
+      div(class="flex justify-end")
+        button(type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500") Send
+
+    ul(class="mt-6 space-y-4")
+      each msg in messages
+        li(class="flex items-center space-x-4 p-4 border-b border-gray-300")
+          if msg.sender_id === user.id
+            div(class="flex items-start space-x-4")
+              span(class="bg-blue-500 text-white rounded-full px-3 py-1 text-sm") You
+              span(class="ml-2 text-gray-700") #{msg.message_text}
+          else
+            div(class="flex items-start space-x-4")
+              span(class="bg-gray-300 rounded-full px-3 py-1 text-sm") #{msg.sender_email}
+              span(class="ml-2 text-gray-700") #{msg.message_text}
