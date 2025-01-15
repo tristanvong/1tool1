@@ -1,0 +1,22 @@
+extends ../layouts/layout
+
+block content
+  h2(class="text-3xl text-center text-[#411900] mt-8") Login to Your Account
+  p(class="mt-4 text-center text-gray-600") Enter your credentials to log in.
+
+  if error
+    p(class="text-red-500 text-center mt-4")!= error
+
+  form(action="/user/login", method="POST", class="max-w-md mx-auto p-8 rounded-lg shadow-md mt-8 bg-gray-50")
+    div(class="mb-6")
+      label(for="email", class="block text-sm font-medium text-[#411900]") Email:
+      input(type="email", name="email", id="email", required=true, placeholder="Enter your email", class="mt-2 w-full px-4 py-2 border border-[#411900] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#411900] focus:border-[#411900]")
+
+    div(class="mb-6")
+      label(for="password", class="block text-sm font-medium text-[#411900]") Password:
+      input(type="password", name="password", id="password", required=true, placeholder="Enter your password", class="mt-2 w-full px-4 py-2 border border-[#411900] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#411900] focus:border-[#411900]")
+
+    div
+      button(type="submit", class="w-full bg-[#411900] text-white py-2 rounded-lg hover:bg-[#6f2600] focus:outline-none focus:ring-2 focus:ring-[#411900] focus:ring-opacity-50") Log In
+    p(class="mt-4 text-center text-gray-600") Don't have an account? 
+      a(href="/user/create", class="text-[#411900] underline hover:text-[#6f2600]") Register

@@ -4,6 +4,61 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.render('user/login', {
+      error: 'Both email and password are required fields.',
+      title: 'Login',
+    });
+  }
+
+  try {
+    const query = 'SELECT * FROM users WHERE email = ?';
+    const [rows] = await pool.query(query, [email]);
+
+    if (rows.length === 0) {
+      return res.render('user/login', {
+        error: 'Invalid email or password.',
+        title: 'Login',
+      });
+    }
+
+    const user = rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.render('user/login', {
+        error: 'Invalid email or password.',
+        title: 'Login',
+      });
+    }
+
+    req.session.user = { id: user.id, name: user.name, email: user.email };
+
+    res.redirect('/user/dashboard');
+  } catch (err) {
+    console.error(err);
+
+    res.render('user/login', {
+      error: 'An unexpected error occurred. Please try again later.',
+      title: 'Login',
+    });
+  }
+};
+
+const logoutUser = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(err);
+      return res.redirect('/user/dashboard');
+    }
+    res.redirect('/user/login');
+  });
+};
+
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -48,4 +103,4 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser };
+module.exports = { createUser, loginUser, logoutUser };
