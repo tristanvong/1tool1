@@ -36,24 +36,71 @@ const createMigrationsTableIfNeeded = () => {
 const dropAllTables = () => {
   const dropTablesQuery = 'SHOW TABLES';
   return new Promise((resolve, reject) => {
-    pool.query(dropTablesQuery, (err, tables) => {
+    pool.query(dropTablesQuery, async (err, tables) => {
       if (err) {
         reject(err);
       } else {
-        const dropPromises = tables.map((table) => {
+        const dropPromises = [];
+
+        for (const table of tables) {
           const tableName = table['Tables_in_' + process.env.DB_NAME];
-          const dropQuery = `DROP TABLE IF EXISTS \`${tableName}\``;
-          return new Promise((resolve, reject) => {
-            pool.query(dropQuery, (dropErr) => {
-              if (dropErr) {
-                reject(dropErr);
-              } else {
-                console.log(`Dropped table: ${tableName}`);
-                resolve();
-              }
-            });
-          });
-        });
+          
+          if (tableName === 'chats') {
+            dropPromises.push(new Promise((resolve, reject) => {
+              pool.query('SHOW TABLES LIKE "messages"', async (err, result) => {
+                if (result.length > 0) {
+                  const dropMessagesQuery = 'DROP TABLE IF EXISTS `messages`';
+                  pool.query(dropMessagesQuery, (dropErr) => {
+                    if (dropErr) {
+                      reject(dropErr);
+                    } else {
+                      console.log('Dropped table: messages');
+                      resolve();
+                    }
+                  });
+                } else {
+                  resolve(); 
+                }
+              });
+            }));
+
+            dropPromises.push(new Promise((resolve, reject) => {
+              const dropChatsQuery = `DROP TABLE IF EXISTS \`${tableName}\``;
+              pool.query(dropChatsQuery, (dropErr) => {
+                if (dropErr) {
+                  reject(dropErr);
+                } else {
+                  console.log(`Dropped table: ${tableName}`);
+                  resolve();
+                }
+              });
+            }));
+          } else if (tableName === 'messages') {
+            dropPromises.push(new Promise((resolve, reject) => {
+              const dropMessagesQuery = `DROP TABLE IF EXISTS \`${tableName}\``;
+              pool.query(dropMessagesQuery, (dropErr) => {
+                if (dropErr) {
+                  reject(dropErr);
+                } else {
+                  console.log(`Dropped table: ${tableName}`);
+                  resolve();
+                }
+              });
+            }));
+          } else {
+            dropPromises.push(new Promise((resolve, reject) => {
+              const dropQuery = `DROP TABLE IF EXISTS \`${tableName}\``;
+              pool.query(dropQuery, (dropErr) => {
+                if (dropErr) {
+                  reject(dropErr);
+                } else {
+                  console.log(`Dropped table: ${tableName}`);
+                  resolve();
+                }
+              });
+            }));
+          }
+        }
 
         Promise.all(dropPromises)
           .then(() => resolve())
@@ -62,6 +109,7 @@ const dropAllTables = () => {
     });
   });
 };
+
 
 const runMigration = (query) => {
   return new Promise((resolve, reject) => {

@@ -1,0 +1,15 @@
+extends layouts/layout
+
+block content
+  h1 Chat Room
+
+  form(action="/chat/send" method="post")
+    input(type="hidden" name="chatRoomId" value=chatRoomId)
+    textarea(name="message") 
+    button(type="submit") Send
+
+  ul
+    each msg in messages
+      li
+        span #{msg.sender_id == user.id ? "You" : msg.sender_id}:
+        span #{msg.content}

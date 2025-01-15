@@ -2,9 +2,17 @@ const express = require('express');
 const router = express.Router();
 const { createUser, loginUser  } = require('../controllers/userController');
 const { isAuthenticated } = require('../middleware/Auth');
+const { pool } = require('../config/db');
 
-router.get('/dashboard', isAuthenticated, (req, res) => {
-    res.render('user/dashboard', { user: req.session.user, title: 'Dashboard' });
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+    try {
+        const query = 'SELECT id, name, email FROM users WHERE id != ?'
+        const [users] = await pool.query(query, [req.session.user.id]);
+        res.render('user/dashboard', { user: req.session.user, users, title: 'Dashboard' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error fetching users');
+    }
 });
 
 router.get('/create', (req, res) => {

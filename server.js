@@ -7,6 +7,7 @@ const { connectDB } = require('./config/db');
 
 const errorRoutes = require('./routes/error');
 const userRoutes = require('./routes/user.js');
+const chatRoutes = require('./routes/chat.js');
 
 dotenv.config();
 const app = express();
@@ -44,6 +45,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.static('public'));
 
+app.use('/', chatRoutes);
 app.use('/user', userRoutes); 
 app.use('/', errorRoutes);
 
