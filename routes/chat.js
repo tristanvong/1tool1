@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {isAuthenticated} = require('../middleware/Auth');
+const {chatRoomAccessMiddleware} = require('../middleware/ChatroomAccess');
 const { pool } = require('../config/db');
 
 router.post('/chat', isAuthenticated, async (req, res) => {
@@ -18,7 +19,7 @@ router.post('/chat', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/chat/room/:id', isAuthenticated, async (req, res) => {
+router.get('/chat/room/:id', isAuthenticated, chatRoomAccessMiddleware, async (req, res) => {
   try {
     const chatRoomId = req.params.id;
     const userId = req.session.user.id;
