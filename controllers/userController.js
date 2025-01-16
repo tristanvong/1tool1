@@ -149,19 +149,44 @@ const deleteUser = async (req, res) => {
   const userId = req.session.user.id;
 
   try {
-      const query = 'DELETE FROM users WHERE id = ?';
-      await pool.query(query, [userId]);
+    const connection = await pool.getConnection();
 
+    try {
+      await connection.beginTransaction();
+
+      const deleteMessagesQuery = `
+        DELETE FROM messages
+        WHERE chat_id IN (
+          SELECT id FROM chats WHERE sender_id = ? OR receiver_id = ?
+        )
+      `;
+      await connection.query(deleteMessagesQuery, [userId, userId]);
+
+      const deleteChatsQuery = 'DELETE FROM chats WHERE sender_id = ? OR receiver_id = ?';
+      await connection.query(deleteChatsQuery, [userId, userId]);
+
+      const deleteUserQuery = 'DELETE FROM users WHERE id = ?';
+      await connection.query(deleteUserQuery, [userId]);
+
+      await connection.commit();
+
+      connection.release();
       req.session.destroy((err) => {
-          if (err) {
-              console.error('Error logging out: ', err);
-              return res.redirect('/user/dashboard');
-          }
-          res.redirect('/user/login');
+        if (err) {
+          console.error('Error logging out:', err);
+          return res.redirect('/user/dashboard');
+        }
+        res.redirect('/user/login');
       });
-  } catch (err) {
+    } catch (err) {
+      await connection.rollback();
+      connection.release();
       console.error(err);
       res.status(500).send('Error deleting account.');
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error establishing database connection.');
   }
 };
 
