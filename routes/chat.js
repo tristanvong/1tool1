@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const {isAuthenticated} = require('../middleware/Auth');
 const {chatRoomAccessMiddleware} = require('../middleware/ChatroomAccess');
+const {chatRoomAlreadyExists} = require('../middleware/ChatAlreadyExists');
 const { pool } = require('../config/db');
 
-router.post('/chat', isAuthenticated, async (req, res) => {
+router.post('/chat', isAuthenticated, chatRoomAlreadyExists, async (req, res) => {
     try {
       const senderId = req.session.user.id;
       const receiverId = req.body.receiverId;
