@@ -147,4 +147,25 @@ const editUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, loginUser, logoutUser, editUser };
+
+const deleteUser = async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+      const query = 'DELETE FROM users WHERE id = ?';
+      await pool.query(query, [userId]);
+
+      req.session.destroy((err) => {
+          if (err) {
+              console.error('Error logging out: ', err);
+              return res.redirect('/user/dashboard');
+          }
+          res.redirect('/user/login');
+      });
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Error deleting account.');
+  }
+};
+
+module.exports = { createUser, loginUser, logoutUser, editUser, deleteUser };

@@ -1,0 +1,10 @@
+extends ../layouts/layout
+
+block content
+  h2(class="text-3xl text-center text-[#411900] mt-8") Delete Your Account
+  p(class="mt-4 text-center text-gray-600") Are you sure you want to delete your account?
+
+  form(action="/user/delete", method="POST", class="max-w-md mx-auto p-8 rounded-lg shadow-md mt-8 bg-gray-50")
+    button(type="submit", class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50") Delete Account
+    p(class="mt-4 text-center text-gray-600") No, go back to 
+      a(href="/user/dashboard", class="text-[#411900] underline hover:text-[#6f2600]") Dashboard

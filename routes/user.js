@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createUser, loginUser, editUser } = require('../controllers/userController');
+const { createUser, loginUser, editUser, deleteUser } = require('../controllers/userController');
 const { isAuthenticated } = require('../middleware/Auth');
 const { pool } = require('../config/db');
 
@@ -57,5 +57,16 @@ router.get('/edit', isAuthenticated, async (req, res) => {
 });
   
 router.post('/edit', isAuthenticated, editUser);
+
+router.get('/delete', isAuthenticated, async (req, res) => {
+    try {
+        res.render('user/delete', { title: 'Delete Account' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error loading delete form.');
+    }
+});
+
+router.post('/delete', isAuthenticated, deleteUser);
 
 module.exports = router;
