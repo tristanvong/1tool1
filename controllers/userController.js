@@ -79,10 +79,7 @@ const createUser = async (req, res) => {
     const query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
     const [result] = await pool.query(query, [name, email, hashedPassword]);
 
-    res.status(201).json({
-      message: 'User created successfully',
-      user: { id: result.insertId, name, email },
-    });
+    res.redirect('/user/login');
   } catch (err) {
     console.error(err);
 
@@ -147,4 +144,50 @@ const editUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, loginUser, logoutUser, editUser };
+
+const deleteUser = async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+    const connection = await pool.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      const deleteMessagesQuery = `
+        DELETE FROM messages
+        WHERE chat_id IN (
+          SELECT id FROM chats WHERE sender_id = ? OR receiver_id = ?
+        )
+      `;
+      await connection.query(deleteMessagesQuery, [userId, userId]);
+
+      const deleteChatsQuery = 'DELETE FROM chats WHERE sender_id = ? OR receiver_id = ?';
+      await connection.query(deleteChatsQuery, [userId, userId]);
+
+      const deleteUserQuery = 'DELETE FROM users WHERE id = ?';
+      await connection.query(deleteUserQuery, [userId]);
+
+      await connection.commit();
+
+      connection.release();
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Error logging out:', err);
+          return res.redirect('/user/dashboard');
+        }
+        res.redirect('/user/login');
+      });
+    } catch (err) {
+      await connection.rollback();
+      connection.release();
+      console.error(err);
+      res.status(500).send('Error deleting account.');
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error establishing database connection.');
+  }
+};
+
+module.exports = { createUser, loginUser, logoutUser, editUser, deleteUser };
