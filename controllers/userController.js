@@ -103,4 +103,48 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, loginUser, logoutUser };
+const editUser = async (req, res) => {
+  const { name, email, password } = req.body;
+  const userId = req.session.user.id;
+
+  if (!name || !email) {
+    return res.render('user/edit', {
+      error: 'Name and email are required fields.',
+      title: 'Edit Account',
+      name,
+      email,
+    });
+  }
+
+  try {
+    let updateQuery = 'UPDATE users SET name = ?, email = ?';
+    const queryParams = [name, email, userId];
+
+    if (password) {
+      const bcryptRounds = parseInt(process.env.BCRYPT_ROUNDS, 10);
+      const hashedPassword = await bcrypt.hash(password, bcryptRounds);
+      updateQuery += ', password = ?';
+      queryParams.splice(2, 0, hashedPassword);
+    }
+
+    updateQuery += ' WHERE id = ?';
+
+    await pool.query(updateQuery, queryParams);
+
+    req.session.user.name = name;
+    req.session.user.email = email;
+
+    res.redirect('/user/dashboard');
+  } catch (err) {
+    console.error(err);
+
+    res.render('user/edit', {
+      title: 'Edit Account',
+      error: 'An unexpected error occurred. Please try again later.',
+      name,
+      email,
+    });
+  }
+};
+
+module.exports = { createUser, loginUser, logoutUser, editUser };
