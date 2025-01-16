@@ -79,10 +79,7 @@ const createUser = async (req, res) => {
     const query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
     const [result] = await pool.query(query, [name, email, hashedPassword]);
 
-    res.status(201).json({
-      message: 'User created successfully',
-      user: { id: result.insertId, name, email },
-    });
+    res.redirect('/user/login');
   } catch (err) {
     console.error(err);
 
