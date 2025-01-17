@@ -8,6 +8,7 @@ const { pool } = require('../config/db');
 router.get('/dashboard', isAuthenticated, getUsersWithLimitOffset, (req, res) => {
     try {
         const { users, limit, offset } = req;
+        const emailQuery = req.query.email || '';
         console.log('offset', offset);
         console.log('limit', limit);
         res.render('user/dashboard', {
@@ -16,6 +17,7 @@ router.get('/dashboard', isAuthenticated, getUsersWithLimitOffset, (req, res) =>
             title: 'Dashboard',
             limit, 
             offset, 
+            emailQuery,
         });
     } catch (err) {
         console.error(err);
