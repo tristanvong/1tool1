@@ -73,7 +73,7 @@ Follow these steps to set up Cookingz locally:
 ## Information (ER-Diagram, Kanban Trello and source credits)
 
 ### 1. ER-Diagram
-![ER-Diagram - 1tool1](https://i.imgur.com/NyoEAU5.png)
+![ER-Diagram - 1tool1](https://i.imgur.com/pK9DIHY.png)
 
 ### 2. Kanban Trello
 - [Trello](https://trello.com/b/mv3yQH5H/kanban-backend-web-1tool1)
@@ -88,3 +88,4 @@ Follow these steps to set up Cookingz locally:
     ``` 
     This sometimes causes a deadlock, please wait a couple seconds before retrying this command.
 - Messages (chats) are stored in plaintext ! Don't send sensitive information such as passwords, addresses et cetera.
+- Technologies: NodeJS, ExpressJS, Pug for frontend rendering, MySQL
