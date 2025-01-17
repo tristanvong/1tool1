@@ -45,7 +45,20 @@ const dropAllTables = () => {
         for (const table of tables) {
           const tableName = table['Tables_in_' + process.env.DB_NAME];
           
-          if (tableName === 'chats') {
+          if (tableName === 'sessions') {
+            console.log('Clearing contents of sessions table');
+            dropPromises.push(new Promise((resolve, reject) => {
+              const deleteSessionsQuery = `DELETE FROM \`${tableName}\``;
+              pool.query(deleteSessionsQuery, (dropErr) => {
+                if (dropErr) {
+                  reject(dropErr);
+                } else {
+                  console.log('Cleared contents of sessions');
+                  resolve();
+                }
+              });
+            }));
+          } else if (tableName === 'chats') {
             dropPromises.push(new Promise((resolve, reject) => {
               pool.query('SHOW TABLES LIKE "messages"', async (err, result) => {
                 if (result.length > 0) {
