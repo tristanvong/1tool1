@@ -4,6 +4,7 @@ const {isAuthenticated} = require('../middleware/Auth');
 const {chatRoomAccessMiddleware} = require('../middleware/ChatroomAccess');
 const {chatRoomAlreadyExists} = require('../middleware/ChatAlreadyExists');
 const { pool } = require('../config/db');
+const { chatValidator } = require('../validators');
 
 router.post('/chat', isAuthenticated, chatRoomAlreadyExists, async (req, res) => {
     try {
@@ -44,30 +45,45 @@ router.get('/chat/room/:id', isAuthenticated, chatRoomAccessMiddleware, async (r
 
 router.post('/chat/send', isAuthenticated, async (req, res) => {
   try {
-    const { chatRoomId, message } = req.body;
-    const senderId = req.session.user.id;
+      const { chatRoomId, message } = req.body;
+      const senderId = req.session.user.id;
 
-    if(message == "" || message == null){
-      return res.send("Message must not be empty!")
-    }
+      const chatValidationError = chatValidator(message);
+      if (chatValidationError) {
+        return res.render('chat_room', {
+            chatRoomId,
+            error: chatValidationError,
+            messages: [],
+            user: req.session.user
+        });
+      }
 
-    const [chatDetails] = await pool.query('SELECT sender_id, receiver_id FROM chats WHERE id = ?', [chatRoomId]);
+      const [chatDetails] = await pool.query('SELECT sender_id, receiver_id FROM chats WHERE id = ?', [chatRoomId]);
 
-    if (!chatDetails.length) {
-      return res.status(404).send('Chat not found.');
-    }
+      if (!chatDetails.length) {
+          return res.status(404).render('chat_room', {
+            chatRoomId,
+            error: 'Chat not found.',
+            messages: [],
+            user: req.session.user
+          });
+      }
 
-    const { sender_id, receiver_id } = chatDetails[0];
+      const { sender_id, receiver_id } = chatDetails[0];
+      const recipientId = senderId === sender_id ? receiver_id : sender_id;
 
-    const recipientId = senderId === sender_id ? receiver_id : sender_id;
+      const query = 'INSERT INTO messages (chat_id, sender_id, receiver_id, message_text) VALUES (?, ?, ?, ?)';
+      await pool.query(query, [chatRoomId, senderId, recipientId, message]);
 
-    const query = 'INSERT INTO messages (chat_id, sender_id, receiver_id, message_text) VALUES (?, ?, ?, ?)';
-    await pool.query(query, [chatRoomId, senderId, recipientId, message]);
-
-    res.redirect(`/chat/room/${chatRoomId}`);
+      res.redirect(`/chat/room/${chatRoomId}`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error sending message.');
+      console.error(err);
+      res.status(500).render('chat_room', {
+        chatRoomId: req.body.chatRoomId,
+        error: 'Error sending message.',
+        messages: [],
+        user: req.session.user
+    });
   }
 });
 
