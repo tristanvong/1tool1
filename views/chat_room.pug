@@ -7,6 +7,10 @@ block content
     form(action="/chat/send" method="post" class="w-full max-w-xl bg-white p-8 rounded shadow-lg")
       input(type="hidden" name="chatRoomId" value=chatRoomId)
 
+      if error
+        div(class="text-red-500 mb-4")
+          | #{error}
+
       div(class="mb-4")
         textarea(name="message" rows="4" placeholder="Type your message..." class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent")
       
