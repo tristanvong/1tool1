@@ -73,7 +73,7 @@ Follow these steps to set up Cookingz locally:
 ## Information (ER-Diagram, Kanban Trello and source credits)
 
 ### 1. ER-Diagram
-- [WIP](https://www.google.com)
+![ER-Diagram - 1tool1](https://i.imgur.com/NyoEAU5.png)
 
 ### 2. Kanban Trello
 - [Trello](https://trello.com/b/mv3yQH5H/kanban-backend-web-1tool1)
