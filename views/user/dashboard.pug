@@ -6,8 +6,15 @@ block content
     h3 Users you can chat with:
 
     form(action="/user/dashboard" method="get")
-        input(type="text" name="query", value= query, placeholder="Search by email, name, or ID")
-        button(type="submit", class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded") Search
+        input(type="text" name="query" value=query placeholder="Search by email, name, or ID")
+        select(name="sort")
+            option(value="id" selected=(sort === 'id')) Sort by ID
+            option(value="name" selected=(sort === 'name')) Sort by Name
+            option(value="email" selected=(sort === 'email')) Sort by Email
+        select(name="order")
+            option(value="ASC" selected=(order === 'ASC')) Ascending
+            option(value="DESC" selected=(order === 'DESC')) Descending
+        button(type="submit", class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded") Apply Sort
 
     each user in users
         form(action="/chat" method="post")
@@ -17,8 +24,9 @@ block content
 
     .pagination
         if offset > 0
-            a(href=`/user/dashboard?limit=${limit}&offset=${offset - limit}`, class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded") Previous
+            a(href=`/user/dashboard?limit=${limit}&offset=${offset - limit}&sort=${sort}&order=${order}&query=${query}`, class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded") Previous
         if users.length === limit
-            a(href=`/user/dashboard?limit=${limit}&offset=${offset + limit}`, class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded") Next
-    form(action="/user/delete", method="GET", class="mt-8")
+            a(href=`/user/dashboard?limit=${limit}&offset=${offset + limit}&sort=${sort}&order=${order}&query=${query}`, class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded") Next
+
+    form(action="/user/delete" method="GET" class="mt-8")
         button(type="submit", class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded") Delete Account

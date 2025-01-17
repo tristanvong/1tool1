@@ -5,19 +5,24 @@ dotenv.config();
 
 const getUsersWithLimitOffset = async (req, res, next) => {
     try {
-        const { limit = 3, offset = 0, query = '' } = req.query;
+        const { limit = 3, offset = 0, query = '', sort = 'id', order = 'ASC' } = req.query;
         const pageLimit = parseInt(limit, 10);
         const pageOffset = parseInt(offset, 10);
-        
-        let queryBase = 'SELECT id, name, email FROM users WHERE id != ?';
+        const validSortFields = ['id', 'name', 'email'];
+        const validOrder = ['ASC', 'DESC'];
+
+        const sortField = validSortFields.includes(sort) ? sort : 'id';
+        const sortOrder = validOrder.includes(order.toUpperCase()) ? order.toUpperCase() : 'ASC';
+
+        let queryBase = `SELECT id, name, email FROM users WHERE id != ?`;
         const queryParams = [req.session.user.id];
 
         if (query) {
-            queryBase += ' AND (name LIKE ? OR email LIKE ? OR id LIKE ?)';
+            queryBase += ` AND (name LIKE ? OR email LIKE ? OR id LIKE ?)`;
             queryParams.push(`%${query}%`, `%${query}%`, `%${query}%`);
         }
 
-        queryBase += ' LIMIT ? OFFSET ?';
+        queryBase += ` ORDER BY ${sortField} ${sortOrder} LIMIT ? OFFSET ?`;
         queryParams.push(pageLimit, pageOffset);
 
         const [users] = await pool.query(queryBase, queryParams);
@@ -25,6 +30,8 @@ const getUsersWithLimitOffset = async (req, res, next) => {
         req.users = users;
         req.limit = pageLimit;
         req.offset = pageOffset;
+        req.sort = sortField;
+        req.order = sortOrder;
 
         next();
     } catch (err) {
