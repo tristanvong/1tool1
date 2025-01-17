@@ -1,0 +1,79 @@
+extends layouts/layout
+
+block content
+    div.container.mx-auto.px-4.py-8
+        h1.text-3xl.font-bold.text-center.mb-6 API Documentation
+        p.text-gray-700.text-center.mb-12 This page lists all available endpoints for the application.
+
+        h2.text-2xl.font-semibold.mb-4 User Routes
+        ul.list-disc.pl-6.mb-8
+            li.mb-4
+                h3.text-lg.font-medium GET /user/dashboard
+                p.text-sm.text-gray-600 Displays the user dashboard with paginated users. 
+                p.text-sm.text-red-600 Uses isAuthenticated and getUserWithLimitOffset middleware. [Login is required]
+            li.mb-4
+                h3.text-lg.font-medium GET /user/create
+                p.text-sm.text-gray-600 Displays a form to create a new user.
+            li.mb-4
+                h3.text-lg.font-medium POST /user/create
+                p.text-sm.text-gray-600 Creates a new user in the system.
+            li.mb-4
+                h3.text-lg.font-medium GET /user/login
+                p.text-sm.text-gray-600 Displays the login form for users.
+            li.mb-4
+                h3.text-lg.font-medium POST /user/login
+                p.text-sm.text-gray-600 Authenticates and logs in a user.
+            li.mb-4
+                h3.text-lg.font-medium GET /user/logout
+                p.text-sm.text-gray-600 Logs out the current user.
+            li.mb-4
+                h3.text-lg.font-medium GET /user/edit
+                p.text-sm.text-gray-600 Displays a form to edit the current user's account details.
+                p.text-sm.text-red-600 Uses isAuthenticated middleware. [Login is required]
+            li.mb-4
+                h3.text-lg.font-medium POST /user/edit
+                p.text-sm.text-gray-600 Updates the current user's account details.
+                p.text-sm.text-red-600 Uses isAuthenticated middleware. [Login is required]
+            li.mb-4
+                h3.text-lg.font-medium GET /user/delete
+                p.text-sm.text-gray-600 Displays a confirmation page for account deletion.
+                p.text-sm.text-red-600 Uses isAuthenticated middleware. [Login is required]
+            li.mb-4
+                h3.text-lg.font-medium POST /user/delete
+                p.text-sm.text-gray-600 Deletes the current user's account.
+                p.text-sm.text-red-600 Uses isAuthenticated middleware. [Login is required]
+
+        h2.text-2xl.font-semibold.mb-4 Chat Routes
+        ul.list-disc.pl-6.mb-8
+            li.mb-4
+                h3.text-lg.font-medium POST /chat
+                p.text-sm.text-gray-600 Starts a chat between the current user and another user.
+                p.text-sm.text-red-600 Uses isAuthenticated and chatRoomAlreadyExists middleware. [Login is required]
+            li.mb-4
+                h3.text-lg.font-medium GET /chat/room/:id
+                p.text-sm.text-gray-600 Displays the chat room for the given chat ID.
+                p.text-sm.text-red-600 Uses isAuthenticated and chatRoomAccessMiddleware middleware. [Login is required]
+            li.mb-4
+                h3.text-lg.font-medium POST /chat/send
+                p.text-sm.text-gray-600 Sends a message in the current chat room.
+                p.text-sm.text-red-600 Uses isAuthenticated middleware. [Login is required]
+
+        h2.text-2xl.font-semibold.mb-4 Error Routes
+        ul.list-disc.pl-6.mb-8
+            li.mb-4
+                h3.text-lg.font-medium 404 - Route Not Found
+                p.text-sm.text-gray-600 Returns a JSON response indicating that the requested route does not exist.
+            li.mb-4
+                h3.text-lg.font-medium 500 - Internal Server Error
+                p.text-sm.text-gray-600 Returns a JSON response for unexpected server errors.
+
+        h2.text-2xl.font-semibold.mb-4 Middleware
+        ul.list-disc.pl-6
+            li.mb-2
+                p.text-sm.text-gray-600 isAuthenticated = grabs the sessions and checks if the user is in it, if the user has a session then they are allowed to the next request.
+            li.mb-2
+                p.text-sm.text-gray-600 chatRoomAlreadyExists = This middleware checks whether a chat already exists between the current user (sender) and the specified receiver. It queries the database for an existing chat where the sender and receiver IDs match in either direction. If a chat is found, the user is redirected to the existing chat room. Otherwise, the request proceeds to the next thing.
+            li.mb-2
+                p.text-sm.text-gray-600 chatRoomAccessMiddleware = This middleware ensures that only authorized users can access a specific chat room. It checks the chat's sender and receiver IDs from the database against the current user's session ID. If the current user is either the sender or the receiver of the chat the request is allowed to proceed. Otherwise, the user receives a 403 Forbidden response. If the chat does not exist, a 404 Not Found response is returned.
+            li.mb-2
+                p.text-sm.text-gray-600 getUsersWithLimitOffset = This middleware retrieves a paginated and optionally filtered list of users from the database, excluding the current user based on their session ID. It supports query parameters for pagination (limit and offset), filtering by a search term (query), and sorting by specific fields (id, name, or email) in ascending or descending order (order). Default values are applied if these parameters are not provided or invalid. The fetched users, along with pagination and sorting details, are assigned to the req object for use in subsequent handlers. If an error occurs, it logs the issue and responds with a 500 Internal Server Error.
