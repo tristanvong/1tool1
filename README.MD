@@ -71,4 +71,20 @@ Follow these steps to set up Cookingz locally:
     ```
    
 ## Information (ER-Diagram, Kanban Trello and source credits)
-- wip
+
+### 1. ER-Diagram
+- [WIP](https://www.google.com)
+
+### 2. Kanban Trello
+- [Trello](https://trello.com/b/mv3yQH5H/kanban-backend-web-1tool1)
+
+### 3. Source Credits
+- [ExpressJS Documentation page](https://expressjs.com/)
+
+### 4. Additional Information
+- There is a command to clean the database re-run all the migrations.
+    ```bash
+    node migrate.js --fresh | -f
+    ``` 
+    This sometimes causes a deadlock, please wait a couple seconds before retrying this command.
+- Messages (chats) are stored in plaintext ! Don't send sensitive information such as passwords, addresses et cetera.
