@@ -2,16 +2,26 @@ const express = require('express');
 const router = express.Router();
 const { createUser, loginUser, editUser, deleteUser } = require('../controllers/userController');
 const { isAuthenticated } = require('../middleware/Auth');
+const { getUsersWithLimitOffset } = require('../middleware/getUsersWithLimitAndOffset');
 const { pool } = require('../config/db');
 
-router.get('/dashboard', isAuthenticated, async (req, res) => {
+router.get('/dashboard', isAuthenticated, getUsersWithLimitOffset, (req, res) => {
     try {
-        const query = 'SELECT id, name, email FROM users WHERE id != ?'
-        const [users] = await pool.query(query, [req.session.user.id]);
-        res.render('user/dashboard', { user: req.session.user, users, title: 'Dashboard' });
+        const { users, limit, offset } = req;
+        const emailQuery = req.query.email || '';
+        console.log('offset', offset);
+        console.log('limit', limit);
+        res.render('user/dashboard', {
+            user: req.session.user, 
+            users, 
+            title: 'Dashboard',
+            limit, 
+            offset, 
+            emailQuery,
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error fetching users');
+        res.status(500).send('Error rendering dashboard');
     }
 });
 
