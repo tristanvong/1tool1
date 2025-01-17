@@ -28,6 +28,7 @@ router.get('/dashboard', isAuthenticated, getUsersWithLimitOffset, (req, res) =>
 router.get('/create', (req, res) => {
     res.render('user/create', {title: 'Create User'}); 
 });
+
 router.post('/create', createUser);
 
 router.get('/login', (req, res) => {
