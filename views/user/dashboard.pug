@@ -10,5 +10,11 @@ block content
             input(type="hidden" name="receiverId" value=user.id)
             p= user.name + " - " + user.email
             button(type="submit", class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded") Chat
+
+    .pagination
+        if offset > 0
+            a(href=`/user/dashboard?limit=${limit}&offset=${offset - limit}`, class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded") Previous
+        if users.length === limit
+            a(href=`/user/dashboard?limit=${limit}&offset=${offset + limit}`, class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded") Next
     form(action="/user/delete", method="GET", class="mt-8")
         button(type="submit", class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded") Delete Account
