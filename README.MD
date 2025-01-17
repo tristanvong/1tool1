@@ -34,8 +34,37 @@ Follow these steps to set up Cookingz locally:
     ```bash
     npm i
     ```
+4. **Create .env file in root of project:**
+
+    ```bash
+    touch .env
+    ```
+    **Paste the following text in the .env file:**
+    ```bash
+    # ----------------------------------|
+    # Database Creds                    |
+    # ----------------------------------|
+    DB_HOST=
+    DB_PORT=
+    DB_USER=
+    DB_PASSWORD=
+    DB_NAME=
+
+    # ----------------------------------|
+    # Server Creds                      |
+    # ----------------------------------|
+    SERVER_PORT=
+    BCRYPT_ROUNDS= # [integer, I recommend 12]
+    SESSION_SECRET= # [example: SecretKey123!]
+    ```
+
+5. **Run migrations:**
+
+    ```bash
+    node migrate.js
+    ```
     
-3. **Start the project with npm script:**
+6. **Start the project with npm script:**
 
     ```bash
     npm run start
