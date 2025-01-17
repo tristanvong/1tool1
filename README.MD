@@ -7,3 +7,39 @@
 A user-friendly messaging service.
 
 The name 1tool1 is a wordplay that reflects its purpose: "1 tool" for secure communication and enabling "1 to 1" private conversations.
+
+## Features
+
+- Send messages to your friends
+- Create or edit your account with ease
+
+## Installation
+
+Follow these steps to set up Cookingz locally:
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/tristanvong/1tool1.git
+   ```
+   
+2. **cd into the project:**
+
+    ```bash
+    cd 1tool1
+    ```
+    
+3. **download all the packages:**
+
+    ```bash
+    npm i
+    ```
+    
+3. **Start the project with npm script:**
+
+    ```bash
+    npm run start
+    ```
+   
+## Information (ER-Diagram, Kanban Trello and source credits)
+- wip
