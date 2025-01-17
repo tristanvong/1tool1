@@ -5,22 +5,22 @@ dotenv.config();
 
 const getUsersWithLimitOffset = async (req, res, next) => {
     try {
-        const { limit = 3, offset = 0, email = '' } = req.query;
+        const { limit = 3, offset = 0, query = '' } = req.query;
         const pageLimit = parseInt(limit, 10);
         const pageOffset = parseInt(offset, 10);
         
-        let query = 'SELECT id, name, email FROM users WHERE id != ?';
+        let queryBase = 'SELECT id, name, email FROM users WHERE id != ?';
         const queryParams = [req.session.user.id];
 
-        if (email) {
-            query += ' AND email LIKE ?'; 
-            queryParams.push(`%${email}%`);
+        if (query) {
+            queryBase += ' AND (name LIKE ? OR email LIKE ? OR id LIKE ?)';
+            queryParams.push(`%${query}%`, `%${query}%`, `%${query}%`);
         }
 
-        query += ' LIMIT ? OFFSET ?';
+        queryBase += ' LIMIT ? OFFSET ?';
         queryParams.push(pageLimit, pageOffset);
 
-        const [users] = await pool.query(query, queryParams);
+        const [users] = await pool.query(queryBase, queryParams);
 
         req.users = users;
         req.limit = pageLimit;
