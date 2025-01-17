@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { pool } = require('../config/db');
 const dotenv = require('dotenv');
+const { emailValidator, passwordValidator, nameValidator } = require('../validators');
 
 dotenv.config();
 
@@ -64,12 +65,19 @@ const createUser = async (req, res) => {
 
   console.log('data:', name, email);
 
-  if (!name || !email || !password) {
+  const errors = [
+    nameValidator(name),
+    emailValidator(email),
+    passwordValidator(password),
+  ].filter((error) => error !== null);
+
+  if (errors.length > 0) {
     return res.render('user/create', {
-      error: 'All fields (name, email, password) are required.',
+      title: 'Create User',
+      error: errors.join(' '),
       name,
-      email
-    });
+      email,
+    })
   }
 
   try {
@@ -104,9 +112,15 @@ const editUser = async (req, res) => {
   const { name, email, password } = req.body;
   const userId = req.session.user.id;
 
-  if (!name || !email) {
+  const errors = [
+    nameValidator(name),
+    emailValidator(email),
+    password ? passwordValidator(password) : null,    
+  ].filter((error) => error !== null);
+
+  if (errors.length > 0){
     return res.render('user/edit', {
-      error: 'Name and email are required fields.',
+      error: errors.join(' '),
       title: 'Edit Account',
       name,
       email,
